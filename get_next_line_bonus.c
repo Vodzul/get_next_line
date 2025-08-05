@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: facelik <facelik@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -66,21 +66,21 @@ char	*setline(char **stashptr)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
+	static char	*stash[1024];
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= 1024)
 		return (NULL);
-	if (!stash)
-		stash = ft_strdup("");
-	if (!stash)
+	if (!stash[fd])
+		stash[fd] = ft_strdup("");
+	if (!stash[fd])
 		return (NULL);
-	while (!ft_strchr(stash, '\n'))
+	while (!ft_strchr(stash[fd], '\n'))
 	{
-		stash = readline(fd, stash);
-		if (!stash)
+		stash[fd] = readline(fd, stash[fd]);
+		if (!stash[fd])
 			return (NULL);
 	}
-	line = setline(&stash);
+	line = setline(&stash[fd]);
 	return (line);
 }
