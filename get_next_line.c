@@ -6,7 +6,7 @@
 /*   By: facelik <facelik@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 21:29:25 by facelik           #+#    #+#             */
-/*   Updated: 2025/08/05 02:56:56 by facelik          ###   ########.fr       */
+/*   Updated: 2025/08/06 21:07:39 by facelik          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,15 @@ char	*readline(int fd, char *stash)
 
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
-		return (NULL);
+		return (free(stash), NULL);
 	while (!ft_strchr(stash, '\n'))
 	{
 		byte = read(fd, buffer, BUFFER_SIZE);
-		if (byte <= 0)
-		{
+		if (byte < 0)
+			return (free(buffer), free(stash), NULL);
+		if (byte == 0)
 			if (!stash || *stash == '\0')
 				return (free(buffer), free(stash), NULL);
-			return (free(buffer), stash);
-		}
 		buffer[byte] = '\0';
 		temp = stash;
 		stash = ft_strjoin(stash, buffer);
