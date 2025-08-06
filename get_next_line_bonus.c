@@ -12,7 +12,7 @@
 
 #include "get_next_line.h"
 
-char	*readline(int fd, char *stash)
+static char	*readline(int fd, char *stash)
 {
 	char	*buffer;
 	ssize_t	byte;
@@ -24,11 +24,10 @@ char	*readline(int fd, char *stash)
 	while (!ft_strchr(stash, '\n'))
 	{
 		byte = read(fd, buffer, BUFFER_SIZE);
-		if (byte < 0)
+		if (byte < 0 || (byte == 0 && (!stash || *stash == '\0')))
 			return (free(buffer), free(stash), NULL);
 		if (byte == 0)
-			if (!stash || *stash == '\0')
-				return (free(buffer), free(stash), NULL);
+			return (free(buffer), stash);
 		buffer[byte] = '\0';
 		temp = stash;
 		stash = ft_strjoin(stash, buffer);
@@ -36,11 +35,10 @@ char	*readline(int fd, char *stash)
 		if (!stash)
 			return (free(buffer), NULL);
 	}
-	free(buffer);
-	return (stash);
+	return (free(buffer), stash);
 }
 
-char	*setline(char **stashptr)
+static char	*setline(char **stashptr)
 {
 	int		i;
 	char	*temp;
