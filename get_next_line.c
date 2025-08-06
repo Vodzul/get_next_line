@@ -21,21 +21,22 @@ char	*readline(int fd, char *stash)
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
-	byte = read(fd, buffer, BUFFER_SIZE);
-	if (byte <= 0)
+	while (!ft_strchr(stash, '\n'))
 	{
-		free(buffer);
-		if (byte < 0 || *stash == '\0' || !stash)
+		byte = read(fd, buffer, BUFFER_SIZE);
+		if (byte <= 0)
 		{
-			free(stash);
-			return (NULL);
+			if (!stash || *stash == '\0')
+				return (free(buffer), free(stash), NULL);
+			return (free(buffer), stash);
 		}
-		return (stash);
+		buffer[byte] = '\0';
+		temp = stash;
+		stash = ft_strjoin(stash, buffer);
+		free(temp);
+		if (!stash)
+			return (free(buffer), NULL);
 	}
-	buffer[byte] = '\0';
-	temp = stash;
-	stash = ft_strjoin(stash, buffer);
-	free(temp);
 	free(buffer);
 	return (stash);
 }
@@ -58,9 +59,14 @@ char	*setline(char **stashptr)
 		return (NULL);
 	temp = ft_substr(stash, i, ft_strlen(stash) - i);
 	if (!temp)
-		return (NULL);
+		return (free(line), NULL);
 	free(*stashptr);
 	*stashptr = temp;
+	if (**stashptr == '\0')
+	{
+		free(*stashptr);
+		*stashptr = NULL;
+	}
 	return (line);
 }
 
@@ -75,12 +81,9 @@ char	*get_next_line(int fd)
 		stash = ft_strdup("");
 	if (!stash)
 		return (NULL);
-	while (!ft_strchr(stash, '\n'))
-	{
-		stash = readline(fd, stash);
-		if (!stash)
-			return (NULL);
-	}
+	stash = readline(fd, stash);
+	if (!stash)
+		return (NULL);
 	line = setline(&stash);
 	return (line);
 }
